@@ -47,7 +47,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         if(!SetTimer(hWnd, ID_TIMER, 50, NULL))
         {
             MessageBox(hWnd, "Could not SetTimer()!", "Error", MB_OK | MB_ICONEXCLAMATION);
-            PostQuitMessage(0);
+            PostQuitMessage(1);
         }
         break;/*
     case WM_PAINT:
@@ -107,7 +107,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     {
         MessageBox(NULL, TEXT("Window Registration Failed!"), TEXT("Error!"),
             MB_ICONEXCLAMATION | MB_OK);
-        return 0;
+        return 1;
     }
     
     hWnd = CreateWindow(szClassName,
@@ -126,7 +126,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     {
         MessageBox(NULL, TEXT("Window Creation Failed!"), TEXT("Error!"),
             MB_ICONEXCLAMATION | MB_OK);
-        return 0;
+        return 1;
     }
     
     ShowWindow(hWnd, nCmdShow);

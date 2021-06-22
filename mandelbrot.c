@@ -130,7 +130,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     {
         MessageBox(NULL, TEXT("Window Registration Failed!"), TEXT("Error!"),
             MB_ICONEXCLAMATION | MB_OK);
-        return 0;
+        return 1;
     }
     
     hWnd = CreateWindow(szClassName,
@@ -143,7 +143,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     {
         MessageBox(NULL, TEXT("Window Creation Failed!"), TEXT("Error!"),
             MB_ICONEXCLAMATION | MB_OK);
-        return 0;
+        return 1;
     }
     
     ShowWindow(hWnd, nCmdShow);
