@@ -1,6 +1,6 @@
 # win32
 
-My Win32 and SDL2 playground. Most of the programs are tailored for creating emulators and games. Feel free to use them in your projects!
+My Win32 and SDL2 playground. Most of the programs are tailored for creating emulators and games. Use them at your own risk. They are not guaranteed to be bug-free.
 
 ## Useful programs
 
