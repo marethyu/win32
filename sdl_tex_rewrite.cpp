@@ -26,15 +26,15 @@ void InitMenu(HWND hWnd)
     HMENU hMenuBar = CreateMenu();
     HMENU hFile = CreatePopupMenu();
     HMENU hHelp = CreatePopupMenu();
-    
+
     AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR) hFile, "File");
     AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR) hHelp, "Help");
-    
+
     AppendMenu(hFile, MF_STRING, ID_LOADROM, "Load ROM");
     AppendMenu(hFile, MF_STRING, ID_EXIT, "Exit");
-    
+
     AppendMenu(hHelp, MF_STRING, ID_ABOUT, "About");
-    
+
     SetMenu(hWnd, hMenuBar);
 }
 
