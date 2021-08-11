@@ -1,5 +1,5 @@
 /* g++ snake.cpp -o snake -lgdi32 -Wl,-subsystem,windows */
-// TODO https://codereview.stackexchange.com/questions/263298/win32-snake-game/263328#263328, std::random
+// TODO https://codereview.stackexchange.com/questions/263298/win32-snake-game/263328#263328, std::random, move bitmapinfo to Snake class
 
 #include <deque>
 #include <vector>
