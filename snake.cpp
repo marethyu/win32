@@ -1,5 +1,5 @@
 /* g++ snake.cpp -o snake -lgdi32 -Wl,-subsystem,windows */
-// TODO https://codereview.stackexchange.com/questions/263298/win32-snake-game/263328#263328, std::random, move bitmapinfo to Snake class
+// TODO https://codereview.stackexchange.com/questions/263298/win32-snake-game/263328#263328, std::random
 
 #include <deque>
 #include <vector>
@@ -25,11 +25,10 @@ class Snake
 {
 public:
     Snake(int rows, int cols);
-    ~Snake();
+    ~Snake() = default;
     void Update(HWND hWnd);
     void DrawBitmap(HDC hdc, RECT *rect, BITMAPINFO info);
     void HandleKey(WPARAM wParam);
-    int GetScore();
 private:
     enum Direction { UP = 0, DOWN, LEFT, RIGHT };
     enum CellType { EMPTY = 0, SNAKE, FOOD };
@@ -57,9 +56,6 @@ Snake::Snake(int rows, int cols)
     dir = UP;
 }
 
-Snake::~Snake()
-{}
-
 void Snake::Update(HWND hWnd)
 {
     snake.push_back(Snake::Move(snake.back()));
@@ -67,20 +63,27 @@ void Snake::Update(HWND hWnd)
     Cell head = snake.back();
     bool eaten = false;
     
-    if (Snake::GetCellType(head.row, head.col) == FOOD)
+    switch (Snake::GetCellType(head.row, head.col))
+    {
+    case FOOD:
     {
         snake.push_back(Snake::Move(head));
         Cell newHead = snake.back();
         Snake::SetCell(newHead.row, newHead.col, SNAKE);
         eaten = true;
+        break;
     }
-    else if (Snake::GetCellType(head.row, head.col) == SNAKE)
+    case SNAKE:
     {
         char buff[200];
-        snprintf(buff, sizeof(buff), "Score: %d", Snake::GetScore());
+        snprintf(buff, sizeof(buff), "Score: %d", snake.size());
         KillTimer(hWnd, ID_TIMER);
         MessageBox(hWnd, TEXT(buff), "Game Over!", MB_OK | MB_ICONINFORMATION);
         DestroyWindow(hWnd);
+        break;
+    }
+    default:
+        break;
     }
     
     Snake::SetCell(head.row, head.col, SNAKE);
@@ -131,11 +134,6 @@ void Snake::HandleKey(WPARAM wParam)
     default:
         break;
     }
-}
-
-int Snake::GetScore()
-{
-    return snake.size();
 }
 
 void Snake::MakeFood()
@@ -265,14 +263,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
     case WM_TIMER:
     {
-        RECT rcClient;
-        HDC hdc = GetDC(hWnd);
-        
-        GetClientRect(hWnd, &rcClient);
         snake->Update(hWnd);
-        snake->DrawBitmap(hdc, &rcClient, info);
-        
-        ReleaseDC(hWnd, hdc);
+        InvalidateRect(hWnd, NULL, FALSE);
         break;
     }
     case WM_KEYDOWN:
