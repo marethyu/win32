@@ -11,7 +11,7 @@
 
 #define SCREEN_WIDTH 160
 #define SCREEN_HEIGHT 144
-#define SCREEN_SCALE_FACTOR 2
+#define SCREEN_SCALE_FACTOR 3
 
 #define ID_LOADROM 0
 #define ID_EXIT 1
