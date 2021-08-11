@@ -123,13 +123,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         }
 
         wnd = SDL_CreateWindowFrom(hWnd);
-        SDL_SetWindowTitle(wnd, "SDL Window");
 
         if (wnd == NULL)
         {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window: %s", SDL_GetError());
             std::exit(1);
         }
+
+        SDL_SetWindowTitle(wnd, "SDL Window");
 
         renderer = SDL_CreateRenderer(wnd, -1, SDL_RENDERER_ACCELERATED);
 
