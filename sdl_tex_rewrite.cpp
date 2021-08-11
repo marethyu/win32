@@ -1,4 +1,4 @@
-/* g++ test_.cpp -o test -lSDL2 */
+/* g++ sdl_tex_rewrite.cpp -o sdl_tex_rewrite -lSDL2 */
 // TODO make a class and add timer
 
 #include <vector>
@@ -149,7 +149,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         InitMenu(hWnd);
         SDL_SetWindowSize(wnd, SCREEN_WIDTH * SCREEN_SCALE_FACTOR, SCREEN_HEIGHT * SCREEN_SCALE_FACTOR); // resize because we just added the menubar
-        SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
 
         break;
     }
