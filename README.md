@@ -8,6 +8,8 @@ My Win32 and SDL2 playground. Most of the programs are tailored for creating emu
 
 - [snake.cpp](snake.cpp): Win32 snake game. Demonstrates Win32 timer and bitmap usage.
 
+- [paint.cpp](paint.cpp): Simple paint app.
+
 - [sdl_fast_render.cpp](sdl_fast_render.cpp): SDL2 rendering with textures.
 
 - [sdlwin_tex.cpp](sdlwin_tex.cpp): Basically it is same as sdl_fast_render.cpp but is enhanced with a Win32 menubar. Demonstrates one way to retrive window handle from a SDL window.
