@@ -1,12 +1,12 @@
 # win32
 
-My Win32 and SDL2 playground. Most of the programs are tailored for creating emulators and games. Use them at your own risk. They are not guaranteed to be bug-free.
+My Win32 and SDL2 playground. Most of the programs are tailored for creating emulators and games. Use them at your own risk. They are not guaranteed to be bug-free. Please open an issue if there are any.
 
 ## Useful programs
 
 - [mandelbrot.c](mandelbrot.c): Render a Mandelbrot set in a Win32 window.
 
-- [snake.cpp](snake.cpp): Win32 snake game. Demonstrates Win32 timer usage and some OOP.
+- [snake.cpp](snake.cpp): Win32 snake game. Demonstrates Win32 timer and bitmap usage.
 
 - [sdl_fast_render.cpp](sdl_fast_render.cpp): SDL2 rendering with textures.
 
