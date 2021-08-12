@@ -12,7 +12,7 @@ My Win32 and SDL2 playground. Most of the programs are tailored for creating emu
 
 - [sdl_fast_render.cpp](sdl_fast_render.cpp): SDL2 rendering with textures.
 
-- [sdlwin_tex.cpp](sdlwin_tex.cpp): Basically it is same as sdl_fast_render.cpp but is enhanced with a Win32 menubar. Demonstrates one way to retrive window handle from a SDL window.
+- [sdlwin_tex.cpp](sdlwin_tex.cpp): Basically it is same as sdl_fast_render.cpp but is enhanced with a Win32 menubar. Demonstrates one way to a retrive window handle from a SDL window.
 
 - [sdl_tex_rewrite_rev.cpp](sdl_tex_rewrite_rev.cpp): Improved version of sdlwin_tex.cpp. Shows how to make SDL window a *child* of a Win32 window.
 
