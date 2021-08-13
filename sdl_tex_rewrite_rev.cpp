@@ -66,7 +66,6 @@ void SDLApp::Create(HWND hWnd)
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window: %s", SDL_GetError());
         std::exit(1);
     }
-    SDL_SetWindowTitle(wnd, "SDL App");
 
     renderer = SDL_CreateRenderer(wnd, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == NULL)
