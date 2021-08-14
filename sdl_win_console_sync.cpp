@@ -1,4 +1,4 @@
-/* g++ test.cpp -o test -lSDL2 */
+/* g++ sdl_win_console_sync.cpp -o sdl_win_console_sync -lSDL2 */
 
 #include <iostream>
 #include <string>
