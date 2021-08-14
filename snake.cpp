@@ -11,6 +11,9 @@
 
 #define ID_TIMER 1
 
+constexpr int ROWS = 40;
+constexpr int COLS = 40;
+
 constexpr int WND_WIDTH = 500;
 constexpr int WND_HEIGHT = 500;
 
@@ -24,10 +27,11 @@ struct Cell
 class Snake
 {
 public:
-    Snake(int rows, int cols);
+    Snake();
     ~Snake() = default;
+    
     void Update(HWND hWnd);
-    void DrawBitmap(HDC hdc, RECT *rect, BITMAPINFO info);
+    void Paint(HWND hWnd);
     void HandleKey(WPARAM wParam);
 private:
     enum Direction { UP = 0, DOWN, LEFT, RIGHT };
@@ -36,24 +40,36 @@ private:
     std::vector<BYTE> pixels;
     std::deque<Cell> snake;
     
-    int rows;
-    int cols;
+    BITMAPINFO info;
+    
     int dir;
     
     void MakeFood();
     void SetCell(int row, int col, CellType type);
+    
     CellType GetCellType(int row, int col);
     Cell Move(const Cell& cell);
 };
 
-Snake::Snake(int rows, int cols)
-  : rows(rows), cols(cols)
+Snake::Snake()
 {
-    pixels.resize(rows * cols * 4);
+    pixels.resize(ROWS * COLS * 4);
     srand(static_cast<unsigned int>(time(NULL)));
     Snake::MakeFood();
-    snake.push_back(Cell(rows / 2, cols / 2));
+    snake.push_back(Cell(ROWS / 2, COLS / 2));
     dir = UP;
+    
+    info.bmiHeader.biSize = sizeof(info.bmiHeader);
+    info.bmiHeader.biWidth = COLS;
+    info.bmiHeader.biHeight = ROWS;
+    info.bmiHeader.biPlanes = 1;
+    info.bmiHeader.biBitCount = 32;
+    info.bmiHeader.biCompression = BI_RGB;
+    info.bmiHeader.biSizeImage = 0;
+    info.bmiHeader.biXPelsPerMeter = 0;
+    info.bmiHeader.biYPelsPerMeter = 0;
+    info.bmiHeader.biClrUsed = 0;
+    info.bmiHeader.biClrImportant = 0;
 }
 
 void Snake::Update(HWND hWnd)
@@ -76,7 +92,7 @@ void Snake::Update(HWND hWnd)
     case SNAKE:
     {
         char buff[200];
-        snprintf(buff, sizeof(buff), "Score: %d", snake.size());
+        snprintf(buff, sizeof(buff), "Score: %d", snake.size() - 1);
         KillTimer(hWnd, ID_TIMER);
         MessageBox(hWnd, TEXT(buff), "Game Over!", MB_OK | MB_ICONINFORMATION);
         DestroyWindow(hWnd);
@@ -95,10 +111,16 @@ void Snake::Update(HWND hWnd)
     if (eaten) Snake::MakeFood();
 }
 
-void Snake::DrawBitmap(HDC hdc, RECT *rect, BITMAPINFO info)
+void Snake::Paint(HWND hWnd)
 {
-    int width = rect->right - rect->left;
-    int height = rect->bottom - rect->top;
+    RECT rcClient;
+    PAINTSTRUCT ps;
+    HDC hdc = BeginPaint(hWnd, &ps);
+    
+    GetClientRect(hWnd, &rcClient);
+    
+    int width = rcClient.right - rcClient.left;
+    int height = rcClient.bottom - rcClient.top;
     
     StretchDIBits(hdc,
                   0,
@@ -107,12 +129,14 @@ void Snake::DrawBitmap(HDC hdc, RECT *rect, BITMAPINFO info)
                   height,
                   0,
                   0,
-                  cols,
-                  rows,
+                  COLS,
+                  ROWS,
                   &pixels[0],
                   &info,
                   DIB_RGB_COLORS,
                   SRCCOPY);
+    
+    EndPaint(hWnd, &ps);
 }
 
 void Snake::HandleKey(WPARAM wParam)
@@ -138,13 +162,13 @@ void Snake::HandleKey(WPARAM wParam)
 
 void Snake::MakeFood()
 {
-    int row = rand() % rows;
-    int col = rand() % cols;
+    int row = rand() % ROWS;
+    int col = rand() % COLS;
     
     while (Snake::GetCellType(row, col) == SNAKE)
     {
-        row = rand() % rows;
-        col = rand() % cols;
+        row = rand() % ROWS;
+        col = rand() % COLS;
     }
     
     Snake::SetCell(row, col, FOOD);
@@ -152,7 +176,7 @@ void Snake::MakeFood()
 
 void Snake::SetCell(int row, int col, CellType type)
 {
-    int offset = row * cols * 4 + col * 4;
+    int offset = row * COLS * 4 + col * 4;
     
     switch (type)
     {
@@ -181,7 +205,7 @@ void Snake::SetCell(int row, int col, CellType type)
 
 Snake::CellType Snake::GetCellType(int row, int col)
 {
-    int offset = row * rows * 4 + col * 4;
+    int offset = row * COLS * 4 + col * 4;
     
     int red = pixels[offset + 2];
     int green = pixels[offset + 1];
@@ -207,39 +231,23 @@ Cell Snake::Move(const Cell& cell)
     }
     
     // teleportation
-    if (c.row == -1)     c.row = rows - 1;
-    if (c.row == rows)   c.row = 0;
-    if (c.col == -1)     c.col = cols - 1;
-    if (c.col == cols)   c.col = 0;
+    if (c.row == -1)     c.row = ROWS - 1;
+    if (c.row == ROWS)   c.row = 0;
+    if (c.col == -1)     c.col = COLS - 1;
+    if (c.col == COLS)   c.col = 0;
     
     return c;
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    static BITMAPINFO info;
     static Snake *snake;
     
     switch (msg)
     {
     case WM_CREATE:
     {
-        int rows = 40;
-        int cols = 40;
-        
-        info.bmiHeader.biSize = sizeof(info.bmiHeader);
-        info.bmiHeader.biWidth = cols;
-        info.bmiHeader.biHeight = rows;
-        info.bmiHeader.biPlanes = 1;
-        info.bmiHeader.biBitCount = 32;
-        info.bmiHeader.biCompression = BI_RGB;
-        info.bmiHeader.biSizeImage = 0;
-        info.bmiHeader.biXPelsPerMeter = 0;
-        info.bmiHeader.biYPelsPerMeter = 0;
-        info.bmiHeader.biClrUsed = 0;
-        info.bmiHeader.biClrImportant = 0;
-        
-        snake = new Snake(rows, cols);
+        snake = new Snake();
         
         if(!SetTimer(hWnd, ID_TIMER, 80, NULL))
         {
@@ -251,14 +259,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
     case WM_PAINT:
     {
-        RECT rcClient;
-        PAINTSTRUCT ps;
-        HDC hdc = BeginPaint(hWnd, &ps);
-        
-        GetClientRect(hWnd, &rcClient);
-        snake->DrawBitmap(hdc, &rcClient, info);
-        
-        EndPaint(hWnd, &ps);
+        snake->Paint(hWnd);
         break;
     }
     case WM_TIMER:
