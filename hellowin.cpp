@@ -10,7 +10,7 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 {
     static TCHAR szWndClassName[] = TEXT("hellowin");
-    HWND hwnd;
+    HWND hWnd;
     MSG msg;
     WNDCLASS wndclass;
 
@@ -33,7 +33,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     }
 
     // Step 2: Creating the Window
-    hwnd = CreateWindow(szWndClassName, /* window class name */
+    hWnd = CreateWindow(szWndClassName, /* window class name */
                         TEXT("Hey!"), /* window title (or caption) */
                         WS_OVERLAPPEDWINDOW, /* window style */
                         CW_USEDEFAULT, /* initial x position */
@@ -45,15 +45,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
                         hInstance, /* program instance handle */
                         NULL); /* creation parameters */
 
-    if (hwnd == NULL)
+    if (hWnd == NULL)
     {
         MessageBox(NULL, TEXT("Window Creation Failed!"), TEXT("Error!"),
             MB_ICONEXCLAMATION | MB_OK);
         return 0;
     }
 
-    ShowWindow(hwnd, iCmdShow);
-    UpdateWindow(hwnd);
+    ShowWindow(hWnd, iCmdShow);
+    UpdateWindow(hWnd);
 
     // Step 3: The Message Loop (heart)
     while (GetMessage(&msg, NULL, 0, 0))
@@ -66,7 +66,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 }
 
 // Step 4: the Window Procedure (brain)
-LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     HDC hdc;
     PAINTSTRUCT ps;
@@ -77,18 +77,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_CREATE:
         break;
     case WM_PAINT:
-        hdc = BeginPaint(hwnd, &ps);
+        hdc = BeginPaint(hWnd, &ps);
 
-        GetClientRect(hwnd, &rect);
+        GetClientRect(hWnd, &rect);
         DrawText(hdc, TEXT("Hello World!"), -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-        EndPaint(hwnd, &ps);
+        EndPaint(hWnd, &ps);
 
         break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
     default:
-        return DefWindowProc(hwnd, message, wParam, lParam);
+        return DefWindowProc(hWnd, message, wParam, lParam);
     }
 
     return 0;
