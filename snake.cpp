@@ -13,9 +13,7 @@
 
 constexpr int ROWS = 40;
 constexpr int COLS = 40;
-
-constexpr int WND_WIDTH = 500;
-constexpr int WND_HEIGHT = 500;
+constexpr int SCREEN_SCALE_FACTOR = 10;
 
 struct Cell
 {
@@ -292,6 +290,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     WNDCLASS wc;
     HWND hWnd;
     MSG msg;
+    RECT rcClient;
+    UINT style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_VISIBLE; // no maximize box and resizing
+    
+    rcClient.left = 0;
+    rcClient.top = 0;
+    rcClient.right = COLS * SCREEN_SCALE_FACTOR;
+    rcClient.bottom = ROWS * SCREEN_SCALE_FACTOR;
+    
+    AdjustWindowRectEx(&rcClient, style, TRUE, 0);
     
     wc.style         = CS_HREDRAW | CS_VREDRAW;
     wc.lpfnWndProc   = WndProc;
@@ -314,11 +321,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     
     hWnd = CreateWindow(szClassName,
                         TEXT("Snake"),
-                        WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, /* this window style prevents window resizing */
+                        style,
                         CW_USEDEFAULT,
                         CW_USEDEFAULT,
-                        WND_WIDTH,
-                        WND_HEIGHT,
+                        rcClient.right - rcClient.left,
+                        rcClient.bottom - rcClient.top,
                         NULL,
                         NULL,
                         hInstance,
