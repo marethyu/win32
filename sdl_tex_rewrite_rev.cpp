@@ -34,7 +34,6 @@ public:
     ~SDLApp();
 
     void Create(HWND);
-    void FixSize();
     void UpdatePixels();
     void Paint();
     void HandleKey(WPARAM wParam);
@@ -80,11 +79,6 @@ void SDLApp::Create(HWND hWnd)
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create texture: %s", SDL_GetError());
         std::exit(1);
     }
-}
-
-void SDLApp::FixSize()
-{
-    SDL_SetWindowSize(wnd, SCREEN_WIDTH * SCREEN_SCALE_FACTOR, SCREEN_HEIGHT * SCREEN_SCALE_FACTOR);
 }
 
 void SDLApp::UpdatePixels()
@@ -180,7 +174,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         SetMenu(hWnd, hMenuBar);
 
-        app.FixSize(); // resize because we just added the menubar
         break;
     }
     case WM_TIMER:
@@ -240,6 +233,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     WNDCLASS wc;
     HWND hWnd;
     MSG msg;
+    RECT rcClient;
+    UINT style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_VISIBLE; // no maximize box and resizing
+
+    rcClient.left = 0;
+    rcClient.top = 0;
+    rcClient.right = SCREEN_WIDTH * SCREEN_SCALE_FACTOR;
+    rcClient.bottom = SCREEN_HEIGHT * SCREEN_SCALE_FACTOR;
+
+    AdjustWindowRectEx(&rcClient, style, TRUE, 0);
 
     wc.style         = CS_HREDRAW | CS_VREDRAW;
     wc.lpfnWndProc   = WndProc;
@@ -261,10 +263,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
 
     hWnd = CreateWindow(szClassName,
-        TEXT("SDLWin"),
-        WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-        CW_USEDEFAULT, CW_USEDEFAULT, SCREEN_WIDTH * SCREEN_SCALE_FACTOR, SCREEN_HEIGHT * SCREEN_SCALE_FACTOR,
-        NULL, NULL, hInstance, NULL);
+        TEXT("SDLWin1"),
+        style,
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        rcClient.right - rcClient.left,
+        rcClient.bottom - rcClient.top,
+        NULL,
+        NULL,
+        hInstance,
+        NULL);
 
     if (hWnd == NULL)
     {
