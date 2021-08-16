@@ -236,13 +236,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     RECT rcClient;
     UINT style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_VISIBLE; // no maximize box and resizing
 
-    rcClient.left = 0;
-    rcClient.top = 0;
-    rcClient.right = SCREEN_WIDTH * SCREEN_SCALE_FACTOR;
-    rcClient.bottom = SCREEN_HEIGHT * SCREEN_SCALE_FACTOR;
-
-    AdjustWindowRectEx(&rcClient, style, TRUE, 0);
-
     wc.style         = CS_HREDRAW | CS_VREDRAW;
     wc.lpfnWndProc   = WndProc;
     wc.cbClsExtra    = 0;
@@ -261,6 +254,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             MB_ICONEXCLAMATION | MB_OK);
         return 0;
     }
+
+    rcClient.left = 0;
+    rcClient.top = 0;
+    rcClient.right = SCREEN_WIDTH * SCREEN_SCALE_FACTOR;
+    rcClient.bottom = SCREEN_HEIGHT * SCREEN_SCALE_FACTOR;
+
+    AdjustWindowRectEx(&rcClient, style, TRUE, 0);
 
     hWnd = CreateWindow(szClassName,
         TEXT("SDLWin1"),
