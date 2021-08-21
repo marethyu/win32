@@ -51,7 +51,7 @@ private:
 
 Snake::Snake()
 {
-    pixels.resize(ROWS * COLS * 4);
+    pixels.resize(ROWS * COLS * 3);
     srand(static_cast<unsigned int>(time(NULL)));
     Snake::MakeFood();
     snake.push_back(Cell(ROWS / 2, COLS / 2));
@@ -61,9 +61,9 @@ Snake::Snake()
     info.bmiHeader.biWidth = COLS;
     info.bmiHeader.biHeight = ROWS;
     info.bmiHeader.biPlanes = 1;
-    info.bmiHeader.biBitCount = 32;
+    info.bmiHeader.biBitCount = 24;
     info.bmiHeader.biCompression = BI_RGB;
-    info.bmiHeader.biSizeImage = ROWS * COLS * 4;
+    info.bmiHeader.biSizeImage = ROWS * COLS * 3;
     info.bmiHeader.biXPelsPerMeter = 0;
     info.bmiHeader.biYPelsPerMeter = 0;
     info.bmiHeader.biClrUsed = 0;
@@ -174,7 +174,7 @@ void Snake::MakeFood()
 
 void Snake::SetCell(int row, int col, CellType type)
 {
-    int offset = row * COLS * 4 + col * 4;
+    int offset = row * COLS * 3 + col * 3;
     
     switch (type)
     {
@@ -182,19 +182,16 @@ void Snake::SetCell(int row, int col, CellType type)
         pixels[offset]     = 0;
         pixels[offset + 1] = 0;
         pixels[offset + 2] = 0;
-        pixels[offset + 3] = 255;
         break;
     case SNAKE:
         pixels[offset]     = 0;
         pixels[offset + 1] = 255;
         pixels[offset + 2] = 0;
-        pixels[offset + 3] = 255;
         break;
     case FOOD:
         pixels[offset]     = 0;
         pixels[offset + 1] = 0;
         pixels[offset + 2] = 255;
-        pixels[offset + 3] = 255;
         break;
     default:
         break;
@@ -203,7 +200,7 @@ void Snake::SetCell(int row, int col, CellType type)
 
 Snake::CellType Snake::GetCellType(int row, int col)
 {
-    int offset = row * COLS * 4 + col * 4;
+    int offset = row * COLS * 3 + col * 3;
     
     int red = pixels[offset + 2];
     int green = pixels[offset + 1];
