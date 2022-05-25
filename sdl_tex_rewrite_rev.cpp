@@ -22,15 +22,8 @@
 
 class SDLApp
 {
-private:
-    SDL_Window *wnd;
-    SDL_Renderer *renderer;
-    SDL_Texture *texture;
-
-    bool flag;
-    std::vector<uint8_t> pixels;
 public:
-    SDLApp();
+    SDLApp(int width, int height);
     ~SDLApp();
 
     void Create(HWND);
@@ -39,9 +32,21 @@ public:
     void HandleKey(WPARAM wParam);
     void CleanUp();
     void Destroy();
+private:
+    SDL_Window* wnd;
+    SDL_Renderer* renderer;
+    SDL_Texture* texture;
+
+    bool flag;
+
+    int width;
+    int height;
+
+    std::vector<uint8_t> pixels;
 };
 
-SDLApp::SDLApp() : pixels(SCREEN_WIDTH * SCREEN_HEIGHT * 4)
+SDLApp::SDLApp(int width, int height)
+  : width(width), height(height), pixels(width * height * 4)
 {
     flag = false;
 }
@@ -73,7 +78,7 @@ void SDLApp::Create(HWND hWnd)
         std::exit(1);
     }
 
-    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
+    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
     if (texture == NULL)
     {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create texture: %s", SDL_GetError());
@@ -83,14 +88,11 @@ void SDLApp::Create(HWND hWnd)
 
 void SDLApp::UpdatePixels()
 {
-    int w = SCREEN_WIDTH;
-    int h = SCREEN_HEIGHT;
-
-    for (int i = 0; i < h; i++)
+    for (int i = 0; i < height; i++)
     {
-        for (int j = 0; j < w; j++)
+        for (int j = 0; j < width; j++)
         {
-            int offset = i * w * 4 + j * 4;
+            int offset = i * width * 4 + j * 4;
 
             int r = std::rand() % 256;
             int g = std::rand() % 256;
@@ -118,7 +120,7 @@ void SDLApp::Paint()
 {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
-    SDL_UpdateTexture(texture, NULL, &pixels[0], SCREEN_WIDTH * 4);
+    SDL_UpdateTexture(texture, NULL, &pixels[0], width * 4);
     SDL_RenderCopy(renderer, texture, NULL, NULL);
     SDL_RenderPresent(renderer);
 }
@@ -152,7 +154,7 @@ void SDLApp::Destroy()
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    static SDLApp app;
+    static SDLApp app(SCREEN_WIDTH, SCREEN_HEIGHT);
 
     switch (msg)
     {
