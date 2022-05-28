@@ -26,13 +26,16 @@ public:
     SDLApp(int width, int height);
     ~SDLApp();
 
-    void Create(HWND hwnd);
+    void Create(HWND hWnd);
     void UpdatePixels();
     void Paint();
+    void HandleMenu(WPARAM wParam);
     void HandleKey(WPARAM wParam);
     void CleanUp();
     void Destroy();
 private:
+    HWND hwnd;
+
     SDL_Window *wnd;
     SDL_Renderer *renderer;
     SDL_Texture *texture;
@@ -84,6 +87,22 @@ void SDLApp::Create(HWND hWnd)
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create texture: %s", SDL_GetError());
         std::exit(1);
     }
+
+    HMENU hMenuBar = CreateMenu();
+    HMENU hFile = CreatePopupMenu();
+    HMENU hHelp = CreatePopupMenu();
+
+    AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR) hFile, "File");
+    AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR) hHelp, "Help");
+
+    AppendMenu(hFile, MF_STRING, ID_LOADROM, "Load ROM");
+    AppendMenu(hFile, MF_STRING, ID_EXIT, "Exit");
+
+    AppendMenu(hHelp, MF_STRING, ID_ABOUT, "About");
+
+    SetMenu(hWnd, hMenuBar);
+
+    hwnd = hWnd;
 }
 
 void SDLApp::UpdatePixels()
@@ -112,6 +131,23 @@ void SDLApp::Paint()
     SDL_RenderPresent(renderer);
 }
 
+void SDLApp::HandleMenu(WPARAM wParam)
+{
+    switch (LOWORD(wParam))
+    {
+    case ID_LOADROM:
+        if(!SetTimer(hwnd, ID_TIMER, UPDATE_INTERVAL, NULL))
+        {
+            MessageBox(hwnd, "Could not set timer!", "Error", MB_OK | MB_ICONEXCLAMATION);
+            PostQuitMessage(1);
+        }
+        break;
+    case ID_EXIT:
+        PostQuitMessage(0);
+        break;
+    }
+}
+
 void SDLApp::HandleKey(WPARAM wParam)
 {
     if (wParam == 0x51) // q key
@@ -132,6 +168,7 @@ void SDLApp::CleanUp()
     wnd = NULL;
 
     SDL_Quit();
+    KillTimer(hwnd, ID_TIMER);
 }
 
 void SDLApp::Destroy()
@@ -148,21 +185,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_CREATE:
     {
         app.Create(hWnd);
-
-        HMENU hMenuBar = CreateMenu();
-        HMENU hFile = CreatePopupMenu();
-        HMENU hHelp = CreatePopupMenu();
-
-        AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR) hFile, "File");
-        AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR) hHelp, "Help");
-
-        AppendMenu(hFile, MF_STRING, ID_LOADROM, "Load ROM");
-        AppendMenu(hFile, MF_STRING, ID_EXIT, "Exit");
-
-        AppendMenu(hHelp, MF_STRING, ID_ABOUT, "About");
-
-        SetMenu(hWnd, hMenuBar);
-
         break;
     }
     case WM_TIMER:
@@ -178,19 +200,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
     case WM_COMMAND:
     {
-        switch (LOWORD(wParam))
-        {
-        case ID_LOADROM:
-            if(!SetTimer(hWnd, ID_TIMER, UPDATE_INTERVAL, NULL))
-            {
-                MessageBox(hWnd, "Could not set timer!", "Error", MB_OK | MB_ICONEXCLAMATION);
-                PostQuitMessage(1);
-            }
-            break;
-        case ID_EXIT:
-            PostQuitMessage(0);
-            break;
-        }
+        app.HandleMenu(wParam);
         break;
     }
     case WM_KEYDOWN:
@@ -201,7 +211,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_CLOSE:
     {
         app.CleanUp();
-        KillTimer(hWnd, ID_TIMER);
         DestroyWindow(hWnd);
         break;
     }
