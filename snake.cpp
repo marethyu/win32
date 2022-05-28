@@ -25,11 +25,11 @@ struct Cell
 class Snake
 {
 public:
-    Snake();
+    Snake(HWND hWnd);
     ~Snake() = default;
     
-    void Update(HWND hWnd);
-    void Paint(HWND hWnd);
+    void Update();
+    void Paint();
     void HandleKey(WPARAM wParam);
 private:
     enum Direction { UP = 0, DOWN, LEFT, RIGHT };
@@ -38,6 +38,7 @@ private:
     std::vector<BYTE> pixels;
     std::deque<Cell> snake;
     
+    HWND hwnd;
     BITMAPINFO info;
     
     int dir;
@@ -49,7 +50,7 @@ private:
     Cell Move(const Cell& cell);
 };
 
-Snake::Snake()
+Snake::Snake(HWND hWnd)
 {
     pixels.resize(ROWS * COLS * 3);
     srand(static_cast<unsigned int>(time(NULL)));
@@ -68,9 +69,17 @@ Snake::Snake()
     info.bmiHeader.biYPelsPerMeter = 0;
     info.bmiHeader.biClrUsed = 0;
     info.bmiHeader.biClrImportant = 0;
+    
+    if(!SetTimer(hWnd, ID_TIMER, 80, NULL))
+    {
+        MessageBox(hWnd, "Could not set timer!", "Error", MB_OK | MB_ICONEXCLAMATION);
+        PostQuitMessage(1);
+    }
+    
+    hwnd = hWnd;
 }
 
-void Snake::Update(HWND hWnd)
+void Snake::Update()
 {
     snake.push_back(Snake::Move(snake.back()));
     
@@ -91,9 +100,9 @@ void Snake::Update(HWND hWnd)
     {
         char buff[200];
         snprintf(buff, sizeof(buff), "Score: %d", snake.size() - 1);
-        KillTimer(hWnd, ID_TIMER);
-        MessageBox(hWnd, TEXT(buff), "Game Over!", MB_OK | MB_ICONINFORMATION);
-        DestroyWindow(hWnd);
+        KillTimer(hwnd, ID_TIMER);
+        MessageBox(hwnd, TEXT(buff), "Game Over!", MB_OK | MB_ICONINFORMATION);
+        DestroyWindow(hwnd);
         break;
     }
     default:
@@ -109,13 +118,13 @@ void Snake::Update(HWND hWnd)
     if (eaten) Snake::MakeFood();
 }
 
-void Snake::Paint(HWND hWnd)
+void Snake::Paint()
 {
     RECT rcClient;
     PAINTSTRUCT ps;
-    HDC hdc = BeginPaint(hWnd, &ps);
+    HDC hdc = BeginPaint(hwnd, &ps);
     
-    GetClientRect(hWnd, &rcClient);
+    GetClientRect(hwnd, &rcClient);
     
     int width = rcClient.right - rcClient.left;
     int height = rcClient.bottom - rcClient.top;
@@ -134,7 +143,7 @@ void Snake::Paint(HWND hWnd)
                   DIB_RGB_COLORS,
                   SRCCOPY);
     
-    EndPaint(hWnd, &ps);
+    EndPaint(hwnd, &ps);
 }
 
 void Snake::HandleKey(WPARAM wParam)
@@ -242,37 +251,36 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE:
     {
-        snake = new Snake();
-        
-        if(!SetTimer(hWnd, ID_TIMER, 80, NULL))
-        {
-            MessageBox(hWnd, "Could not set timer!", "Error", MB_OK | MB_ICONEXCLAMATION);
-            PostQuitMessage(1);
-        }
-        
+        snake = new Snake(hWnd);
         break;
     }
     case WM_PAINT:
     {
-        snake->Paint(hWnd);
+        snake->Paint();
         break;
     }
     case WM_TIMER:
     {
-        snake->Update(hWnd);
+        snake->Update();
         InvalidateRect(hWnd, NULL, FALSE);
         break;
     }
     case WM_KEYDOWN:
+    {
         snake->HandleKey(wParam);
         break;
+    }
     case WM_CLOSE:
+    {
+        delete snake;
         DestroyWindow(hWnd);
         break;
+    }
     case WM_DESTROY:
-        delete snake;
+    {
         PostQuitMessage(0);
         break;
+    }
     default:
         return DefWindowProc(hWnd, msg, wParam, lParam);
     }
